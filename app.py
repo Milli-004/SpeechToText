@@ -1,9 +1,8 @@
-# app.py
 import gradio as gr
 import whisper
 from transformers import pipeline
 
-# Load models (once at startup)
+# Load models
 print("Loading Whisper model...")
 model = whisper.load_model("base")
 print("Whisper model loaded!")
@@ -12,34 +11,38 @@ print("Loading sentiment model...")
 sentiment = pipeline("sentiment-analysis")
 print("Sentiment model loaded!")
 
-# Function to handle audio -> transcription + sentiment
+# Function
 def speech_sentiment(audio_file):
-    """
-    Input: path to audio file
-    Output: transcription text, sentiment
-    """
+
     if audio_file is None:
-        return "No audio uploaded.", "No sentiment"
-    
+        return "No audio uploaded", "No sentiment"
+
     # Transcribe audio
     result = model.transcribe(audio_file)
-    text = result['text']
-    
-    # Analyze sentiment
-    sentiment_result = sentiment(text)
-    
-    # Return transcription + sentiment label + score
-    return text, f"{sentiment_result[0]['label']} ({sentiment_result[0]['score']:.2f})"
+    text = result["text"]
 
-# Gradio interface
+    # Sentiment analysis
+    sentiment_result = sentiment(text)
+
+    label = sentiment_result[0]["label"]
+    score = sentiment_result[0]["score"]
+
+    sentiment_output = f"{label} ({score:.2f})"
+
+    return text, sentiment_output
+
+
+# Gradio Interface
 iface = gr.Interface(
     fn=speech_sentiment,
-    inputs=gr.Audio(source="upload", type="filepath"),
-    outputs=["text", "text"],
+    inputs=gr.Audio(type="filepath", label="Upload Audio"),
+    outputs=[
+        gr.Textbox(label="Transcribed Text"),
+        gr.Textbox(label="Sentiment Result")
+    ],
     title="Speech Sentiment Analysis",
-    description="Upload an audio file to get its transcription and sentiment analysis."
+    description="Upload an audio file to get transcription and sentiment analysis."
 )
 
-# Launch Gradio app (Gradio Hub will handle permanent hosting)
 if __name__ == "__main__":
     iface.launch()
