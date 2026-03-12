@@ -31,9 +31,3 @@ License: MIT
 Copy code
 
 ---
-
-✅ **Instructions:**  
-
-- Replace `https://yourusername-yourappname.hf.space` with your **Hugging Face Space link**.  
-- Replace the GitHub clone URL with your **actual repo URL**.  
-
